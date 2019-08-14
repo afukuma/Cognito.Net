@@ -1,4 +1,6 @@
 ﻿using Amazon;
+using Amazon.CognitoIdentityProvider;
+using Amazon.Extensions.CognitoAuthentication;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,7 +24,8 @@ namespace CognitoDesktop
         public Form1()
         {
             InitializeComponent();
-        }
+             btnSignIn.Click += BtnSignIn_ClickAsync;
+       }
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -39,6 +42,33 @@ namespace CognitoDesktop
                     wwRegion = wR;
                     return;
                 }
+            }
+
+
+        }
+
+        private async void BtnSignIn_ClickAsync(object sender, EventArgs e)
+        {
+            try
+            {
+                AmazonCognitoIdentityProviderClient provider =
+                    new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), wwRegion);
+                CognitoUserPool userPool = new CognitoUserPool(wwUserPoolID, wwAppClientID, provider);
+                CognitoUser user = new CognitoUser(txtID.Text, wwAppClientID, userPool, provider);
+                InitiateSrpAuthRequest authRequest = new InitiateSrpAuthRequest()
+                {
+                    Password = txtPass.Text
+                };
+
+                AuthFlowResponse authResponse = await user.StartWithSrpAuthAsync(authRequest).ConfigureAwait(false);
+                string accessToken = authResponse.AuthenticationResult.AccessToken;
+
+                MessageBox.Show(accessToken);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
 
         }
