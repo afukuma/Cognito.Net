@@ -2,4 +2,19 @@
 # この .gitignore ファイルは Microsoft(R) Visual Studio によって自動的に作成されました。
 ################################################################################
 
-/.vs/CognitoDesktop/v16
+.vs/
+
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+*.cache
+
+# Build results
+
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+[Bb]in/
+[Oo]bj/
