@@ -1,6 +1,9 @@
 ﻿using Amazon;
+using Amazon.CognitoIdentity;
 using Amazon.CognitoIdentityProvider;
 using Amazon.Extensions.CognitoAuthentication;
+using Amazon.S3;
+using Amazon.S3.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,7 +22,10 @@ namespace CognitoDesktop
 
         private string wwUserPoolID = "";
         private string wwAppClientID = "";
+        private string wwIdPoolID = "";
         RegionEndpoint wwRegion;
+        private string wwS3BucketName = "";
+
 
         public Form1()
         {
@@ -32,6 +38,9 @@ namespace CognitoDesktop
             //App.Configから各種情報の取得
             wwUserPoolID = ConfigurationManager.AppSettings["UserPoolID"];
             wwAppClientID = ConfigurationManager.AppSettings["AppClientID"];
+            wwIdPoolID = ConfigurationManager.AppSettings["IdPoolID"];
+
+            wwS3BucketName = ConfigurationManager.AppSettings["S3BucketName"];
 
             string wwRegionString = ConfigurationManager.AppSettings["RegionString"];
             wwRegion = null;
@@ -62,9 +71,26 @@ namespace CognitoDesktop
 
                 AuthFlowResponse authResponse = await user.StartWithSrpAuthAsync(authRequest).ConfigureAwait(false);
                 string accessToken = authResponse.AuthenticationResult.AccessToken;
+                string idToken = authResponse.AuthenticationResult.IdToken;
 
-                MessageBox.Show(accessToken);
+                // Amazon Cognito 認証情報プロバイダーを初期化します
+                CognitoAWSCredentials credentials = new CognitoAWSCredentials(
+                    wwIdPoolID, // ID プールの ID
+                    wwRegion    // リージョン
+                );
 
+                credentials.AddLogin("cognito-idp.us-east-1.amazonaws.com/" + wwUserPoolID, idToken); // the raw token
+                //↓おまじない
+                string hoge = await credentials.GetIdentityIdAsync();
+
+                using (var client = new AmazonS3Client(credentials, wwRegion))
+                {
+                    var listObjectRequest = new ListObjectsRequest();
+                    listObjectRequest.BucketName = wwS3BucketName;
+                    var response = await client.ListObjectsAsync(listObjectRequest);
+                    //ここでオブジェクトがとれる
+                    ;
+                }
             }
             catch (Exception ex)
             {
