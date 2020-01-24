@@ -15,12 +15,12 @@ App.Configに下記のように設定する
   </appSettings>
 ```
 
-|Key | Value| 
-| ----- | ------ |
-| UserPoolID| ユーザプールID| 
-| AppClientID| アプリケーションクライアントID| 
-| IdPoolID| IDプールのID| 
-| RegionString| リージョン文字列| 
-| S3BucketName| S3バケット名| 
+|Key | Value 例| 内容 |
+| ----- | ------ | ------ |
+| UserPoolID| us-east-1_hhogehogeh|ユーザプールID| 
+| AppClientID| 4ks0na9rghogehogehoge0l|アプリケーションクライアントID| 
+| IdPoolID| us-east-1:7864a4bf-8045-4221-a280-hogehogehoge|IDプールのID| 
+| RegionString|us-east-1 |リージョン文字列| 
+| S3BucketName|hogehogeS3BucketName |S3バケット名| 
 
 
